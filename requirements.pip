@@ -1,0 +1,6 @@
+astropy
+numpy
+Pillow
+pretty-fits
+requests
+click
