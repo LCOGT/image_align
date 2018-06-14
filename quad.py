@@ -294,3 +294,25 @@ def mindist(cats):
     tests = [(0,1), (0,2), (0,3), (1,2), (1,3), (2,3)]
     dists = np.array([np.linalg.norm(np.array(cats[0]['x'], cats[0]['y']) - np.array(cats[1]['x'], cats[1]['y'])) for (i,j) in tests])
     return np.min(dists)
+
+def removeduplicates(quadlist, verbose=True):
+    """
+    Returns a quadlist without quads with identical hashes...
+    """
+    # To avoid crash in lexsort if quadlist is too small :
+    if len(quadlist) < 2:
+        return quadlist
+    hasharray = np.array([q.hash for q in quadlist])
+
+    order = np.lexsort(hasharray.T)
+    hasharray = hasharray[order]
+    #diff = np.diff(hasharray, axis=0)
+    diff = np.fabs(np.diff(hasharray, axis=0))
+    #diff = np.sum(diff, axis=1)
+    ui = np.ones(len(hasharray), 'bool')
+    ui[1:] = (diff >= 0.000001).any(axis=1)
+    #print(hasharray[ui==False])
+    if verbose:
+        print("Removing %i/%i duplicates" % (len(quadlist) - np.sum(ui), len(quadlist)))
+
+    return [quad for (quad, u) in zip(quadlist, ui) if u == True]
